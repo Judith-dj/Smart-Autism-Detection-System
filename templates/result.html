@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autism Prediction Result</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* ---------------- Body & Background ---------------- */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ---------------- Container ---------------- */
+    .container {
+      max-width: 1200px;
+      margin: 20px;
+      display: flex;
+      gap: 30px;
+      width: 95%;
+      flex-wrap: wrap;
+    }
+
+    /* ---------------- Glass Cards ---------------- */
+    .results, .chatbot {
+      border-radius: 25px;
+      padding: 30px;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      flex: 1;
+      min-width: 320px;
+      transition: transform 0.3s ease;
+    }
+
+    .results:hover, .chatbot:hover {
+      transform: translateY(-5px);
+    }
+
+    /* ---------------- Headings ---------------- */
+    .results h2, .chatbot h2 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #FF758C, #FF7EB3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .results p, .results ul li {
+      color:black;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .results ul {
+      list-style: disc;
+      padding-left: 25px;
+      margin-top: 10px;
+    }
+
+    /* ---------------- Images ---------------- */
+    .results img {
+      margin-top: 15px;
+      border-radius: 20px;
+      max-width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .results img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+
+    /* ---------------- Chatbot ---------------- */
+    .chatbot {
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+      min-width: 350px;
+      color: #fff;
+    }
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      border-radius: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: rgba(0,0,0,0.2);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .message {
+      margin-bottom: 10px;
+      max-width: 80%;
+      word-wrap: break-word;
+      padding: 12px 18px;
+      border-radius: 18px;
+      animation: fadeIn 0.4s ease;
+      font-size: 0.95rem;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background: #FF7EB3;
+      color: #fff;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background: #6C63FF;
+      color: #fff;
+      border-bottom-left-radius: 0;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-box {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 15px;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .send-button, .icon-button {
+      padding: 12px 18px;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #FF758C, #FF7EB3);
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .send-button:hover, .icon-button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #FFBABA, #FF7EB3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .container { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Results Section -->
+    <div class="results">
+      <h2>🧠 Autism Prediction Result</h2>
+      <p><strong>Risk Score:</strong> {{ score | round(2) }}</p>
+      <p><strong>Interpretation:</strong> {{ interpretation }}</p>
+
+      <h3>Recommended Next Steps</h3>
+      <ul>
+        {% for step in next_steps %}
+          <li>{{ step }}</li>
+        {% endfor %}
+      </ul>
+
+      <button class="send-button" style="margin-top: 10px;" onclick="copyRiskToChatbot()">
+        📋 Copy Risk Info to Chatbot
+      </button>
+
+      <h3>Visualizations</h3>
+      <img src="{{ url_for('static', filename='risk_bar.png') }}" alt="Bar Chart">
+      <img src="{{ url_for('static', filename='risk_pie.png') }}" alt="Pie Chart">
+    </div>
+
+    <!-- Chatbot Section -->
+    <div class="chatbot">
+      <h2>💬 Ask Your Doubts</h2>
+      <div class="chat-container" id="chat-container"></div>
+      <div class="input-container">
+        <textarea id="user-input" class="input-box" placeholder="Ask a question..."></textarea>
+        <button class="send-button" onclick="callGeminiAPI()">Send</button>
+        <button class="icon-button" id="mic-button" onclick="startListening()"><i class="fas fa-microphone"></i></button>
+        <button class="icon-button" id="stop-button" onclick="stopVoice()" style="display: none;"><i class="fas fa-stop"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyRiskToChatbot() {
+      const scoreText = "Risk Score: {{ score | round(2) }}";
+      const interpretationText = "Interpretation: {{ interpretation }}";
+      let stepsText = "Next Steps:\n";
+      {% for step in next_steps %}
+          stepsText += "- {{ step }}\n";
+      {% endfor %}
+      const fullText = scoreText + "\n" + interpretationText + "\n" + stepsText;
+
+      navigator.clipboard.writeText(fullText).then(() => {
+        alert("✅ Risk info copied to clipboard.");
+        const chatInput = document.getElementById('user-input');
+        if(chatInput){ chatInput.value = fullText; chatInput.focus(); }
+      }).catch(err => alert("❌ Failed: "+err));
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('user-input').value = transcript;
+      callGeminiAPI();
+    };
+    function startListening(){
+      recognition.start();
+      document.getElementById('mic-button').style.display='none';
+      document.getElementById('stop-button').style.display='inline-block';
+    }
+    function stopVoice(){
+      window.speechSynthesis.cancel();
+      recognition.stop();
+      document.getElementById('mic-button').style.display='inline-block';
+      document.getElementById('stop-button').style.display='none';
+    }
+
+    function speak(text){
+      const speech = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(speech);
+    }
+
+    async function callGeminiAPI() {
+      const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=YOUR_API_KEY";
+      const userInput = document.getElementById('user-input').value.trim();
+      const outputBox = document.getElementById('chat-container');
+      if(!userInput){ alert("Please enter text."); return; }
+
+      outputBox.innerHTML += <div class="message user-message">${userInput}</div>;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ "contents":[{"parts":[{"text":userInput}]}] })
+        });
+
+        const data = await response.json();
+        let responseText = "Sorry, could not understand.";
+
+        if(data && data.candidates && data.candidates.length>0){
+          const parts = data.candidates[0].content.parts;
+          if(parts && parts.length>0 && parts[0].text) responseText = parts[0].text;
+        }
+
+        outputBox.innerHTML += <div class="message bot-message">${responseText}</div>;
+        outputBox.scrollTop = outputBox.scrollHeight;
+        speak(responseText);
+      } catch(err){ alert("Error: "+err); console.error(err); }
+      document.getElementById('user-input').value="";
+    }
+  </script>
+</body>
+</html>

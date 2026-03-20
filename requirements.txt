@@ -1,0 +1,13 @@
+flask
+tensorflow
+librosa
+soundfile
+opencv-python
+numpy
+scikit-learn
+mediapipe
+matplotlib
+seaborn
+protobuf>=5.28.0
+pandas
+python-multipart
