@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Autism Detection</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -15,15 +15,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      background: linear-gradient(135deg,#FFDEE9 , #FFDEE9);
     }
 
     .container {
@@ -31,23 +23,24 @@
       backdrop-filter: blur(15px);
       border-radius: 20px;
       padding: 40px;
-      width: 90%;
-      max-width: 600px;
+      width: 95%;
+      max-width: 1000px;
       text-align: center;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
       color: #080808;
     }
 
     h1 {
-      font-size: 2rem;
+      font-size: 3rem;
+      font-weight: 900;
       margin-bottom: 10px;
-      color: #100c0c;
+      padding: 20px;
     }
 
     p {
-      color: #000000;
       font-size: 1rem;
       margin-bottom: 25px;
+      padding: 20px;
     }
 
     label {
@@ -55,30 +48,25 @@
       text-align: left;
       margin: 12px 0 5px;
       font-weight: 600;
-      color: #000000;
     }
 
-    input[type="file"], input[type="number"] {
+    input[type="file"], 
+    input[type="number"] {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
       border: none;
-      outline: none;
       margin-bottom: 15px;
       background: rgba(255,255,255,0.85);
-      color: #333;
       font-size: 1rem;
-      transition: box-shadow 0.3s ease;
     }
 
-    input:focus {
-      box-shadow: 0 0 10px rgba(255,255,255,0.6);
-    }
-
+    /* ✅ Common button style */
     button {
-      width: 100%;
+      width: 50%;
       padding: 12px;
-      margin-top: 10px;
+      margin: 10px auto;     /* 🔥 center */
+      display: block;        /* 🔥 required */
       border-radius: 10px;
       border: none;
       background: linear-gradient(90deg, #00b4d8, #0077b6);
@@ -86,7 +74,7 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      transition: 0.3s;
     }
 
     button:hover {
@@ -101,11 +89,6 @@
       padding-top: 25px;
     }
 
-    .converter h2 {
-      margin-bottom: 10px;
-      color: #fff;
-    }
-
     #statusMsg {
       margin-top: 10px;
       font-weight: 500;
@@ -114,44 +97,46 @@
     #downloadLink {
       display: none;
       margin-top: 10px;
-      color: #90ee90;
+      color: green;
       font-weight: 600;
       text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    #downloadLink:hover {
-      color: #fff;
     }
 
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>🧠 Smart Autism Detector</h1>
+
+    <h1>Smart Autism Detector</h1>
     <p>Upload your child's audio and video to predict autism risk using AI.</p>
 
     <form action="/predict" method="POST" enctype="multipart/form-data">
-      <label>🎧 Audio (.wav):</label>
+      <label>🎧 Child's Audio (.wav):</label>
       <input type="file" name="audio" accept=".wav" required>
 
-      <label>🎥 Video (.mp4):</label>
+      <label>🎥 Child's Video (.mp4):</label>
       <input type="file" name="video" accept=".mp4" required>
 
-      <label>👶 Age (months, optional):</label>
+      <label>🔢 Child's Age in months (optional):</label>
       <input type="number" name="age_months" min="0">
 
-      <button type="submit">🚀 Predict Risk</button>
+      <button type="submit">Predict Risk</button>
     </form>
 
     <div class="converter">
-      <h2>🎵 MP3 → WAV Converter</h2>
+      <h2 style="color:black;">🎵 MP3 → WAV Converter</h2>
       <p>If your audio is in MP3 format, convert it below:</p>
+
       <input type="file" id="mp3File" accept=".mp3">
+
+      <!-- ✅ CENTERED BUTTON -->
       <button onclick="convertToWav()">Convert to WAV</button>
+
       <p id="statusMsg"></p>
       <a id="downloadLink" download>⬇ Download Converted WAV File</a>
     </div>
+
   </div>
 
   <script>
@@ -194,5 +179,6 @@
       }
     }
   </script>
+
 </body>
 </html>
