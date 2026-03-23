@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autism Prediction Result</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FFDEE9, #FFDEE9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 95%;
+    }
+
+    .results {
+      border-radius: 25px;
+      padding: 30px;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .results h2 {
+      text-align: center;
+      font-size: 2.8rem;
+      color: black;
+    }
+
+    .results h3 {
+      padding-top: 35px;
+    }
+
+    .results p,
+    .results ul li {
+      color: black;
+      font-size: 1rem;
+    }
+
+    .results ul {
+      padding-left: 20px;
+    }
+
+    /* 🔥 MAIN LAYOUT */
+    .main-content {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .left {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .right img {
+      width: 230px;
+      border-radius: 15px;
+      padding: 10px;
+      background: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .img1{
+      padding-top: 50px;
+    }
+
+    .send-button {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, #00b4d8, #0077b6);
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    /* 📱 Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .right {
+        flex-direction: row;
+        gap: 20px;
+
+      }
+
+      .right img {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="results">
+
+      <div class="main-content">
+
+        <!-- LEFT SIDE -->
+        <div class="left">
+          <h2>🧠 Autism Prediction Result</h2>
+
+          <p><strong>Risk Score:</strong> {{ score | round(2) }}</p>
+          <p><strong>Interpretation:</strong> {{ interpretation }}</p>
+
+          <h3>Recommended Next Steps</h3>
+          <ul>
+            {% for step in next_steps %}
+            <li>{{ step }}</li>
+            {% endfor %}
+          </ul>
+
+          <button class="send-button" onclick="copyRisk()">
+            📋 Copy Risk Info
+          </button>
+        </div>
+
+        <!-- RIGHT SIDE CHARTS -->
+        <div class="right">
+          <img class="img1" src="{{ url_for('static', filename='risk_bar.png') }}">
+          <img class="img2" src="{{ url_for('static', filename='risk_pie.png') }}">
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function copyRisk() {
+      const text = "Risk Score: {{ score | round(2) }}\nInterpretation: {{ interpretation }}";
+      navigator.clipboard.writeText(text);
+      alert("Copied!");
+    }
+    async function convertToWav() {
+
+      const fileInput = document.getElementById("mp3File");
+      const file = fileInput.files[0];
+      const status = document.getElementById("statusMsg");
+      const downloadLink = document.getElementById("downloadLink");
+
+      // ❌ No file selected
+      if (!file) {
+        alert("Please select an MP3 file first!");
+        return;
+      }
+
+      // 📦 Prepare data
+      const formData = new FormData();
+      formData.append("mp3_file", file);
+
+      // ⏳ Show loading
+      status.innerText = "⏳ Converting MP3 to WAV...";
+      downloadLink.style.display = "none";
+
+      try {
+        const response = await fetch("/convert_mp3", {
+          method: "POST",
+          body: formData
+        });
+
+        // ❌ Error handling
+        if (!response.ok) {
+          throw new Error("Conversion failed");
+        }
+
+        // 📥 Get file
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // 🔗 Show download link
+        downloadLink.href = url;
+        downloadLink.download = file.name.replace(".mp3", ".wav");
+        downloadLink.style.display = "block";
+        downloadLink.innerText = "⬇ Download Converted WAV File";
+
+        // ✅ Success message
+        status.innerText = "✅ Conversion successful!";
+
+      } catch (error) {
+        // ❌ Error message
+        status.innerText = "❌ Error: " + error.message;
+        console.error(error);
+      }
+    }
+  </script>
+
+</body>
+
+</html>

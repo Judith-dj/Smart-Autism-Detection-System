@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Autism Detection</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg,#FFDEE9 , #FFDEE9);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 95%;
+      max-width: 1000px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      color: #080808;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      padding: 20px;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 25px;
+      padding: 20px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin: 12px 0 5px;
+      font-weight: 600;
+    }
+
+    input[type="file"], 
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.85);
+      font-size: 1rem;
+    }
+
+    /* ✅ Common button style */
+    button {
+      width: 50%;
+      padding: 12px;
+      margin: 10px auto;     /* 🔥 center */
+      display: block;        /* 🔥 required */
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, #00b4d8, #0077b6);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,180,216,0.4);
+      background: linear-gradient(90deg, #0096c7, #023e8a);
+    }
+
+    .converter {
+      margin-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.3);
+      padding-top: 25px;
+    }
+
+    #statusMsg {
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    #downloadLink {
+      display: none;
+      margin-top: 10px;
+      color: green;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>Smart Autism Detector</h1>
+    <p>Upload your child's audio and video to predict autism risk using AI.</p>
+
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+      <label>🎧 Child's Audio (.wav):</label>
+      <input type="file" name="audio" accept=".wav" required>
+
+      <label>🎥 Child's Video (.mp4):</label>
+      <input type="file" name="video" accept=".mp4" required>
+
+      <label>🔢 Child's Age in months (optional):</label>
+      <input type="number" name="age_months" min="0">
+
+      <button type="submit">Predict Risk</button>
+    </form>
+
+    <div class="converter">
+      <h2 style="color:black;">🎵 MP3 → WAV Converter</h2>
+      <p>If your audio is in MP3 format, convert it below:</p>
+
+      <input type="file" id="mp3File" accept=".mp3">
+
+      <!-- ✅ CENTERED BUTTON -->
+      <button onclick="convertToWav()">Convert to WAV</button>
+
+      <p id="statusMsg"></p>
+      <a id="downloadLink" download>⬇ Download Converted WAV File</a>
+    </div>
+
+  </div>
+
+  <script>
+    async function convertToWav() {
+      const fileInput = document.getElementById("mp3File");
+      const file = fileInput.files[0];
+      const status = document.getElementById("statusMsg");
+      const downloadLink = document.getElementById("downloadLink");
+
+      if (!file) {
+        alert("Please select an MP3 file first!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("mp3_file", file);
+
+      status.innerText = "⏳ Converting MP3 to WAV...";
+      downloadLink.style.display = "none";
+
+      try {
+        const response = await fetch("/convert_mp3", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) throw new Error("Conversion failed.");
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        downloadLink.href = url;
+        downloadLink.download = file.name.replace(".mp3", ".wav");
+        downloadLink.style.display = "block";
+        downloadLink.innerText = "✅ Download Converted WAV File";
+
+        status.innerText = "Conversion successful!";
+      } catch (error) {
+        status.innerText = "❌ Error: " + error.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
